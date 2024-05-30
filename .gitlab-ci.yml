@@ -1,6 +1,7 @@
 #variables:
 #   APP_NAME: hamid-webapp
 
+
 image: docker:latest
 services: 
     - name: docker:dind
