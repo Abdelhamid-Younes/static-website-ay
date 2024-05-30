@@ -47,29 +47,29 @@ deploy staging:
   stage: Deploy staging
   environment:
     name: staging
-    url: https://my-app-staging.herokuapp.com
+    url: https://env-ay-staging.herokuapp.com
   only:
     - master
   script:
     - apk --no-cache add npm
     - npm install -g heroku
     - heroku container:login
-    - heroku create my-app-staging || echo "project already exist"
-    - heroku container:push -a my-app-staging web
-    - heroku container:release -a my-app-staging web
+    - heroku create env-ay-staging || echo "project already exist"
+    - heroku container:push -a env-ay-staging web
+    - heroku container:release -a env-ay-staging web
 
 deploy prod:
   stage: Deploy prod
   environment:
     name: prod
-    url: https://my-app-prod.herokuapp.com
+    url: https://env-ay-prod.herokuapp.com
   only:
     - master
   script:
     - apk --no-cache add npm
     - npm install -g heroku
     - heroku container:login
-    - heroku create my-app-prod || echo "project already exist"
-    - heroku container:push -a my-app-prod web
-    - heroku container:release -a my-app-prod web
+    - heroku create env-ay-prod || echo "project already exist"
+    - heroku container:push -a env-ay-prod web
+    - heroku container:release -a env-ay-prod web
 
