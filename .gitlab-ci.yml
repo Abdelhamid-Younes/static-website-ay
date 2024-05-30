@@ -1,0 +1,41 @@
+#variables:
+#   APP_NAME: hamid-webapp
+
+image: docker:latest
+services: 
+    - name: docker:dind
+      alias: docker
+
+stages:
+    - Build
+    - Test acceptation
+    - Release image
+
+
+docker-build:
+    stage: Build
+    script:
+        - docker build -t static-website-ay .
+        - docker save static-website-ay > static-website-ay.tar
+    artifacts:
+        paths:
+            - static-website-ay.tar
+
+test acceptation:
+    stage: Test acceptation
+    script:
+        - docker load < static-website-ay.tar
+        - docker run -d -p 80:80 --name static-website-ay-container static-website-ay
+        - sleep 5
+        - apk --no-cache add curl
+        - curl "http://docker:80" | grep -i "Dimension"
+
+release image:
+    stage: Release image
+    script:
+        - docker load < static-website-ay.tar
+        - docker tag static-website-ay "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
+        - docker tag static-website-ay "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+        - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+        - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
+        - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
