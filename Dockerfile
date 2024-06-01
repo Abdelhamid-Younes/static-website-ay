@@ -1,4 +1,4 @@
-FROM nginx:1.21.1
+FROM stable-alpine-otel
 LABEL maintainer="Abdelhamid YOUNES"
 RUN apk update && \
     apk upgrade && \
