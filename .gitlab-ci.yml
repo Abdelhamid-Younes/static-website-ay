@@ -32,7 +32,7 @@ test acceptation:
         - docker run -d -p $APP_CONTAINER_PORT:$APP_EXPOSED_PORT -e PORT=$APP_CONTAINER_PORT --name static-website-ay-container static-website-ay
         - sleep 5
         - apk --no-cache add curl
-        - curl "http://docker:APP_CONTAINER_PORT" | grep -i "Dimension"
+        - curl "http://docker:$APP_CONTAINER_PORT" | grep -i "Dimension"
 
 release image:
     stage: Release image
