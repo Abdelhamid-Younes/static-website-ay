@@ -1,4 +1,4 @@
-FROM nginx:stable-alpine3.17-slim
+FROM nginx:1.21.1
 LABEL maintainer="Abdelhamid YOUNES"
 RUN apk update && \
     apk upgrade && \
