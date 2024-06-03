@@ -47,7 +47,7 @@ deploy staging:
   stage: Deploy staging
   environment:
     name: staging
-    url: https://env-ay-staging-19404dd8ab76.herokuapp.com/
+    url: https://env-ay-staging-a8b49f681c7b.herokuapp.com/
   only:
     - master
   script:
@@ -62,7 +62,7 @@ deploy prod:
   stage: Deploy prod
   environment:
     name: prod
-    url:  https://env-ay-prod-4a5088e44cbf.herokuapp.com/ 
+    url:  https://env-ay-prod-d158a29b1fec.herokuapp.com/
   only:
     - master
   script:
