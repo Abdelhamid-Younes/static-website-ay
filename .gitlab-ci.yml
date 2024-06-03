@@ -54,7 +54,7 @@ deploy staging:
     - apk --no-cache add npm
     - npm install -g heroku
     - heroku container:login
-    - heroku create env-ay-staging || echo "project already exist"
+    - heroku create env-ay-staging || echo "project already exists"
     - heroku container:push -a env-ay-staging web
     - heroku container:release -a env-ay-staging web
 
@@ -69,7 +69,7 @@ deploy prod:
     - apk --no-cache add npm
     - npm install -g heroku
     - heroku container:login
-    - heroku create env-ay-prod || echo "project already exist"
+    - heroku create env-ay-prod || echo "project already exists"
     - heroku container:push -a env-ay-prod web
     - heroku container:release -a env-ay-prod web
 
