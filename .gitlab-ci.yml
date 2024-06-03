@@ -16,7 +16,6 @@ stages:
     - Deploy review
     - Stop review
 
-
 docker-build:
     stage: Build
     script:
