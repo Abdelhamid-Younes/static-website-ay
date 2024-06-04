@@ -120,13 +120,17 @@ stop review:
 .test staging:
   <<: *test
   stage: Test staging
+  only:
+  - master
   variables:
-    DOMAIN: env-ay-staging-a8b49f681c7b.herokuapp.com/
+    DOMAIN: ${STG_APP_ENDPOINT}
 
 
 .test prod:
   <<: *test
   stage: Test prod
+  only:
+    - master  
   variables:
-    DOMAIN: env-ay-prod-d158a29b1fec.herokuapp.com
+    DOMAIN: ${PROD_APP_ENDPOINT}
 
