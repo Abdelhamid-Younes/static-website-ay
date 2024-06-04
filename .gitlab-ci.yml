@@ -85,42 +85,36 @@ deploy prod:
     - apk --no-cache add curl
     - 'curl -X POST http://${PROD_API_ENDPOINT}/prod -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
 
-.deploy review:
+deploy review:
   stage: Deploy review
-  only:
-    - merge_requests
-  script:
-    - apk --no-cache add npm jq
-    - npm install -g heroku
-    - heroku container:login
-    - heroku create env-ay-$CI_COMMIT_REF_NAME  || echo "project already exists"
-    - heroku container:push -a env-ay-$CI_COMMIT_REF_NAME web
-    - heroku container:release -a env-ay-$CI_COMMIT_REF_NAME web
-    - REVIEW_ENVIRONMENT_URL=$(heroku info env-ay-$CI_COMMIT_REF_NAME --json | jq -r '.app.web_url')
-    - echo "REVIEW_ENVIRONMENT_URL=$REVIEW_ENVIRONMENT_URL" >> deploy.env
-  artifacts:
-    reports:
-      dotenv: deploy.env  
   environment:
     name: review/$CI_COMMIT_REF_NAME
-    url: $REVIEW_ENVIRONMENT_URL
+    url: http://${REVIEW_APP_ENDPOINT}
     on_stop: stop review
+  only:
+    - merge_requests
+  variables:
+    APP_NAME: ${REVIEW_APP_NAME}
+  script:
+    - apk --no-cache add curl
+    - echo $APP_NAME
+    - 'curl -X POST http://${REVIEW_API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
 
-.stop review:
+stop review:
   stage: Stop review
   variables:
     GIT_STRATEGY: none
+    APP_NAME: ${REVIEW_APP_NAME}
   environment:
     name: review/$CI_COMMIT_REF_NAME
     action: stop
   only:
     - merge_requests
-  when: manual
+  when: manual  
   script:
-    - apk --no-cache add npm
-    - npm install -g heroku
-    - heroku container:login
-    - heroku apps:destroy -a env-ay-$CI_COMMIT_REF_NAME -c env-ay-$CI_COMMIT_REF_NAME
+    - apk --no-cache add curl
+    - 'curl -X DELETE http://${REVIEW_API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\"}"'
+
 
 
 .test staging:
