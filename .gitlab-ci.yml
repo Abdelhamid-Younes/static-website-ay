@@ -117,7 +117,7 @@ stop review:
 
 
 
-.test staging:
+test staging:
   <<: *test
   stage: Test staging
   only:
@@ -126,7 +126,7 @@ stop review:
     DOMAIN: ${STG_APP_ENDPOINT}
 
 
-.test prod:
+test prod:
   <<: *test
   stage: Test prod
   only:
