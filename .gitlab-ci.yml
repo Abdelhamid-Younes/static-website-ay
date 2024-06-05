@@ -42,7 +42,7 @@ stages:
     - master
   script:
     - apk --no-cache add curl
-    - curl "http://$DOMAIN" | grep -i "Dimension"  
+    - curl "http://${DOMAIN}" | grep -i "Dimension"  
 
 .docker-build:
     stage: Build
