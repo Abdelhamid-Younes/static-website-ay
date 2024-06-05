@@ -16,6 +16,8 @@ variables:
   GIT_STRATEGY: none
 
 image: docker:latest
+default:
+  interruptible: true
 services: 
     - name: docker:dind
       alias: docker  
@@ -39,7 +41,7 @@ stages:
     - master
   script:
     - apk --no-cache add curl
-    - curl "https://$DOMAIN" | grep -i "Dimension"  
+    - curl "http://$DOMAIN" | grep -i "Dimension"  
 
 docker-build:
     stage: Build
@@ -71,27 +73,6 @@ release image:
         - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
         - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
 
-deploy staging:
-  stage: Deploy staging
-  environment:
-    name: staging
-    url: http://${STG_APP_ENDPOINT}
-  only:
-    - master
-  script:
-    - apk --no-cache add curl
-    - 'curl -X POST http://${STG_API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\",  \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"' 
-
-deploy prod:
-  stage: Deploy prod
-  environment:
-    name: prod
-    url: http://${PROD_APP_ENDPOINT}
-  only:
-    - master
-  script:
-    - apk --no-cache add curl
-    - 'curl -X POST http://${PROD_API_ENDPOINT}/prod -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
 
 deploy review:
   stage: Deploy review
@@ -123,6 +104,17 @@ stop review:
     - apk --no-cache add curl
     - 'curl -X DELETE http://${REVIEW_API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\"}"'
 
+deploy staging:
+  stage: Deploy staging
+  environment:
+    name: staging
+    url: http://${STG_APP_ENDPOINT}
+  only:
+    - master
+  interruptible: false
+  script:
+    - apk --no-cache add curl
+    - 'curl -X POST http://${STG_API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\",  \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"' 
 
 test staging:
   <<: *test
@@ -132,6 +124,17 @@ test staging:
   variables:
     DOMAIN: ${STG_APP_ENDPOINT}
 
+deploy prod:
+  stage: Deploy prod
+  environment:
+    name: prod
+    url: http://${PROD_APP_ENDPOINT}
+  only:
+    - master
+  interruptible: false
+  script:
+    - apk --no-cache add curl
+    - 'curl -X POST http://${PROD_API_ENDPOINT}/prod -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
 
 test prod:
   <<: *test
