@@ -11,6 +11,8 @@ variables:
   EXTERNAL_PORT: 80
   CONTAINER_IMAGE: ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}
 
+  GIT_STRATEGY: none
+
 image: docker:latest
 services: 
     - name: docker:dind
@@ -116,7 +118,6 @@ stop review:
   script:
     - apk --no-cache add curl
     - 'curl -X DELETE http://${REVIEW_API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\"}"'
-
 
 
 test staging:
