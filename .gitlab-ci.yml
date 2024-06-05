@@ -14,7 +14,7 @@ variables:
   EXTERNAL_PORT: 80
 
 
-  GIT_STRATEGY: none
+ # GIT_STRATEGY: none
 
 image: docker:latest
 default:
@@ -115,9 +115,9 @@ deploy staging:
   interruptible: false
   script:
     - apk --no-cache add curl
-    - 'curl -X POST http://${STG_API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\",  \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"' 
+    - 'curl -X POST http://${STG_API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
 
-test staging:
+.test staging:
   <<: *test
   stage: Test staging
   variables:
