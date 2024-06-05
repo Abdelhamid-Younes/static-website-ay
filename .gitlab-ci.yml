@@ -3,12 +3,12 @@ variables:
   REVIEW_APP_NAME: static-website-ay-${CI_COMMIT_REF_NAME}
   CONTAINER_IMAGE: ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}
   
-  PROD_API_ENDPOINT: ip10-0-32-4-cpg6odtcd84000a7dmlg-1993.direct.docker.labs.eazytraining.fr
-  PROD_APP_ENDPOINT: ip10-0-32-4-cpg6odtcd84000a7dmlg-80.direct.docker.labs.eazytraining.fr
-  STG_API_ENDPOINT: ip10-0-32-5-cpg6odtcd84000a7dmlg-1993.direct.docker.labs.eazytraining.fr
-  STG_APP_ENDPOINT: ip10-0-32-5-cpg6odtcd84000a7dmlg-80.direct.docker.labs.eazytraining.fr
-  REVIEW_API_ENDPOINT: ip10-0-32-6-cpg6odtcd84000a7dmlg-1993.direct.docker.labs.eazytraining.fr
-  REVIEW_APP_ENDPOINT: ip10-0-32-6-cpg6odtcd84000a7dmlg-80.direct.docker.labs.eazytraining.fr
+  PROD_API_ENDPOINT: ip10-0-35-6-cpg7q45cd84000a7dmt0-1993.direct.docker.labs.eazytraining.fr
+  PROD_APP_ENDPOINT: ip10-0-35-6-cpg7q45cd84000a7dmt0-80.direct.docker.labs.eazytraining.fr
+  STG_API_ENDPOINT: ip10-0-35-5-cpg7q45cd84000a7dmt0-1993.direct.docker.labs.eazytraining.fr
+  STG_APP_ENDPOINT: ip10-0-35-5-cpg7q45cd84000a7dmt0-80.direct.docker.labs.eazytraining.fr
+  REVIEW_API_ENDPOINT: ip10-0-35-4-cpg7q45cd84000a7dmt0-1993.direct.docker.labs.eazytraining.fr
+  REVIEW_APP_ENDPOINT: ip10-0-35-4-cpg7q45cd84000a7dmt0-80.direct.docker.labs.eazytraining.fr
 
   INTERNAL_PORT: 5000
   EXTERNAL_PORT: 80
