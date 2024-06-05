@@ -105,7 +105,7 @@ stages:
     - apk --no-cache add curl
     - 'curl -X DELETE http://${REVIEW_API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\"}"'
 
-deploy staging:
+.deploy staging:
   stage: Deploy staging
   environment:
     name: staging
@@ -117,13 +117,13 @@ deploy staging:
     - apk --no-cache add curl
     - 'curl -X POST http://${STG_API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
 
-.test staging:
+test staging:
   <<: *test
   stage: Test staging
   variables:
     DOMAIN: ${STG_APP_ENDPOINT}
 
-deploy prod:
+.deploy prod:
   stage: Deploy prod
   environment:
     name: prod
@@ -135,7 +135,7 @@ deploy prod:
     - apk --no-cache add curl
     - 'curl -X POST http://${PROD_API_ENDPOINT}/prod -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
 
-.test prod:
+test prod:
   <<: *test
   stage: Test prod
   variables:
