@@ -7,8 +7,8 @@ variables:
   PROD_APP_ENDPOINT: ip10-0-56-4-cpgrrnlcd84000a7dno0-80.direct.docker.labs.eazytraining.fr
   STG_API_ENDPOINT: ip10-0-56-5-cpgrrnlcd84000a7dno0-1993.direct.docker.labs.eazytraining.fr
   STG_APP_ENDPOINT: ip10-0-56-5-cpgrrnlcd84000a7dno0-80.direct.docker.labs.eazytraining.fr
-  REVIEW_API_ENDPOINT: ip10-0-56-6-cpgrrnlcd84000a7dno0-1993.direct.docker.labs.eazytraining.fr
-  REVIEW_APP_ENDPOINT: ip10-0-56-6-cpgrrnlcd84000a7dno0-80.direct.docker.labs.eazytraining.fr
+  REVIEW_API_ENDPOINT: ip10-0-59-6-cpgtkb5cd84000a7dnsg-1993.direct.docker.labs.eazytraining.fr
+  REVIEW_APP_ENDPOINT: ip10-0-59-6-cpgtkb5cd84000a7dnsg-80.direct.docker.labs.eazytraining.fr
 
   INTERNAL_PORT: 5000
   EXTERNAL_PORT: 80
