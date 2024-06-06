@@ -44,7 +44,7 @@ stages:
     - apk --no-cache add curl
     - curl "http://${DOMAIN}" | grep -i "Dimension"  
 
-docker-build:
+.docker-build:
     stage: Build
     variables:
       GIT_STRATEGY: clone
@@ -55,7 +55,7 @@ docker-build:
         paths:
             - ${APP_NAME}.tar
 
-test acceptation:
+.test acceptation:
     stage: Test acceptation
     script:
         - docker load < ${APP_NAME}.tar
@@ -64,7 +64,7 @@ test acceptation:
         - apk --no-cache add curl
         - curl "http://docker:" | grep -i "Dimension"
 
-release image:
+.release image:
     stage: Release image
     script:
         - docker load < ${APP_NAME}.tar
@@ -81,7 +81,7 @@ deploy review:
     url: http://${REVIEW_APP_ENDPOINT}
     on_stop: stop review
   only:
-    - merge_requests
+    - master
   variables:
     APP_NAME: ${REVIEW_APP_NAME}
   script:
@@ -98,13 +98,13 @@ stop review:
     name: review/$CI_COMMIT_REF_NAME
     action: stop
   only:
-    - merge_requests
+    - master
   when: manual  
   script:
     - apk --no-cache add curl
     - 'curl -X DELETE http://${REVIEW_API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\"}"'
 
-deploy staging:
+.deploy staging:
   stage: Deploy staging
   environment:
     name: staging
@@ -116,13 +116,13 @@ deploy staging:
     - apk --no-cache add curl
     - 'curl -X POST http://${STG_API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
 
-test staging:
+.test staging:
   <<: *test
   stage: Test staging
   variables:
     DOMAIN: ${STG_APP_ENDPOINT}
 
-deploy prod:
+.deploy prod:
   stage: Deploy prod
   environment:
     name: prod
@@ -134,7 +134,7 @@ deploy prod:
     - apk --no-cache add curl
     - 'curl -X POST http://${PROD_API_ENDPOINT}/prod -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
 
-test prod:
+.test prod:
   <<: *test
   stage: Test prod
   variables:
