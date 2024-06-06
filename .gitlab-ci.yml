@@ -87,7 +87,7 @@ deploy review:
   script:
     - apk --no-cache add curl
     - echo $APP_NAME
-    - 'curl -X POST http://${REVIEW_API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
+    - 'curl -X POST http://${REVIEW_API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${REVIEW_APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
 
 stop review:
   stage: Stop review
@@ -102,7 +102,7 @@ stop review:
   when: manual  
   script:
     - apk --no-cache add curl
-    - 'curl -X DELETE http://${REVIEW_API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\"}"'
+    - 'curl -X DELETE http://${REVIEW_API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${REVIEW_APP_NAME}\"}"'
 
 .deploy staging:
   stage: Deploy staging
