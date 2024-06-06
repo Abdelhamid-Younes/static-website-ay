@@ -74,7 +74,6 @@ release image:
         - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
         - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
 
-
 deploy review:
   stage: Deploy review
   environment:
