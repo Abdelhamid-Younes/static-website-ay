@@ -58,7 +58,7 @@ release image:
     - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
     - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
 
-.deploy review:
+deploy review:
   stage: Deploy review
   environment:
     name: review/$CI_COMMIT_REF_NAME
@@ -70,7 +70,7 @@ release image:
     - apk --no-cache add curl
     - 'curl -i -v -X POST http://${API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${REVIEW_EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}" 2>&1 | grep 200'
     
-.stop review:
+stop review:
   stage: Stop review
   variables:
     GIT_STRATEGY: none
@@ -86,8 +86,8 @@ release image:
 
 .test_template: &test
   image: alpine
-  only:
-    - master
+#  only:
+#    - main
   script:
     - apk --no-cache add curl
     - curl "http://$DOMAIN" | grep -i "Dimension" 
@@ -97,11 +97,11 @@ deploy staging:
   environment:
     name: staging
     url: http://${EAZYLABS_IP}-${STG_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
-  only:
-    - master
+#  only:
+#    - main
   script:
     - apk --no-cache add curl
-    - 'curl -X POST http://${API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${STG_EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
+    - 'curl -i -v -X POST http://${API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${STG_EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"  2>&1 | grep 200'
 
 test staging:
   stage: Test staging
@@ -109,20 +109,21 @@ test staging:
   variables:
     DOMAIN: ${EAZYLABS_IP}-${STG_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
 
-.deploy prod:
+deploy prod:
   stage: Deploy prod
   environment:
     name: prod
     url: http://${EAZYLABS_IP}-${PROD_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
   only: 
-    - master
+    - main
   script:
     - apk --no-cache add curl
     - 'curl -v -X POST http://${API_ENDPOINT}/prod -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${PROD_EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}" 2>&1 | grep 200'
 
-.test prod:
+test prod:
   stage: Test prod
   <<: *test
   variables:
     DOMAIN: ${EAZYLABS_IP}-${PROD_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
-
+  only:
+    - main
