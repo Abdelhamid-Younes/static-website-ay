@@ -3,12 +3,12 @@ variables:
   REVIEW_APP_NAME: static-website-ay-${CI_COMMIT_REF_NAME}
   CONTAINER_IMAGE: ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}
   
-  PROD_API_ENDPOINT: ip10-0-35-6-cpg7q45cd84000a7dmt0-1993.direct.docker.labs.eazytraining.fr
-  PROD_APP_ENDPOINT: ip10-0-35-6-cpg7q45cd84000a7dmt0-80.direct.docker.labs.eazytraining.fr
-  STG_API_ENDPOINT: ip10-0-35-5-cpg7q45cd84000a7dmt0-1993.direct.docker.labs.eazytraining.fr
-  STG_APP_ENDPOINT: ip10-0-35-5-cpg7q45cd84000a7dmt0-80.direct.docker.labs.eazytraining.fr
-  REVIEW_API_ENDPOINT: ip10-0-35-4-cpg7q45cd84000a7dmt0-1993.direct.docker.labs.eazytraining.fr
-  REVIEW_APP_ENDPOINT: ip10-0-35-4-cpg7q45cd84000a7dmt0-80.direct.docker.labs.eazytraining.fr
+  PROD_API_ENDPOINT: ip10-0-56-4-cpgrrnlcd84000a7dno0-1993.direct.docker.labs.eazytraining.fr
+  PROD_APP_ENDPOINT: ip10-0-56-4-cpgrrnlcd84000a7dno0-80.direct.docker.labs.eazytraining.fr
+  STG_API_ENDPOINT: ip10-0-56-5-cpgrrnlcd84000a7dno0-1993.direct.docker.labs.eazytraining.fr
+  STG_APP_ENDPOINT: ip10-0-56-5-cpgrrnlcd84000a7dno0-80.direct.docker.labs.eazytraining.fr
+  REVIEW_API_ENDPOINT: ip10-0-56-6-cpgrrnlcd84000a7dno0-1993.direct.docker.labs.eazytraining.fr
+  REVIEW_APP_ENDPOINT: ip10-0-56-6-cpgrrnlcd84000a7dno0-80.direct.docker.labs.eazytraining.fr
 
   INTERNAL_PORT: 5000
   EXTERNAL_PORT: 80
@@ -44,7 +44,7 @@ stages:
     - apk --no-cache add curl
     - curl "http://${DOMAIN}" | grep -i "Dimension"  
 
-.docker-build:
+docker-build:
     stage: Build
     variables:
       GIT_STRATEGY: clone
@@ -55,7 +55,7 @@ stages:
         paths:
             - ${APP_NAME}.tar
 
-.test acceptation:
+test acceptation:
     stage: Test acceptation
     script:
         - docker load < ${APP_NAME}.tar
@@ -64,7 +64,7 @@ stages:
         - apk --no-cache add curl
         - curl "http://docker:" | grep -i "Dimension"
 
-.release image:
+release image:
     stage: Release image
     script:
         - docker load < ${APP_NAME}.tar
@@ -140,4 +140,3 @@ test prod:
   stage: Test prod
   variables:
     DOMAIN: ${PROD_APP_ENDPOINT}
-
