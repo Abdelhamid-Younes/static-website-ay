@@ -28,7 +28,7 @@ stages:
   - Test prod
 
 
-docker-build:
+.docker-build:
   stage: Build image
   script:
     - docker build -t ${APP_NAME} .
@@ -39,7 +39,7 @@ docker-build:
     when: on_success
     expire_in: 2 days
 
-test acceptation:
+.test acceptation:
   stage: Test acceptation
   script:
     - docker load < ${APP_NAME}.tar
@@ -48,7 +48,7 @@ test acceptation:
     - sleep 5
     - curl "http://docker:${TEST_PORT}" | grep -i "Dimension"
 
-release image:
+.release image:
   stage: Release image
   script:
     - docker load < ${APP_NAME}.tar
@@ -101,7 +101,7 @@ deploy staging:
     - master
   script:
     - apk --no-cache add curl
-    - 'curl -i -v -X POST http://${API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${STG_EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"  2>&1 | grep 200'
+    - 'curl -i -v -X POST http://${API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${STG_EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}'
 
 test staging:
   stage: Test staging
@@ -109,7 +109,7 @@ test staging:
   variables:
     DOMAIN: ${EAZYLABS_IP}-${STG_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
 
-deploy prod:
+.deploy prod:
   stage: Deploy prod
   environment:
     name: prod
@@ -120,7 +120,7 @@ deploy prod:
     - apk --no-cache add curl
     - 'curl -v -X POST http://${API_ENDPOINT}/prod -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${PROD_EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}" 2>&1 | grep 200'
 
-test prod:
+.test prod:
   stage: Test prod
   <<: *test
   variables:
