@@ -28,7 +28,7 @@ stages:
   - Test prod
 
 
-.docker-build:
+docker-build:
   stage: Build image
   script:
     - docker build -t ${APP_NAME} .
@@ -39,7 +39,7 @@ stages:
     when: on_success
     expire_in: 2 days
 
-.test acceptation:
+test acceptation:
   stage: Test acceptation
   script:
     - docker load < ${APP_NAME}.tar
@@ -48,7 +48,7 @@ stages:
     - sleep 5
     - curl "http://docker:${TEST_PORT}" | grep -i "Dimension"
 
-.release image:
+release image:
   stage: Release image
   script:
     - docker load < ${APP_NAME}.tar
