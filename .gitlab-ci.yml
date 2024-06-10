@@ -1,15 +1,16 @@
 variables:
-  EAZYLABS_IP: ip10-0-62-4-cpgupndcd84000a7do0g # It looks like ip10-0-2-3-cem9qp0mjkegg872cb10
-  APP_NAME: ulrich-staticwebsite
-  EAZYLABS_DOMAIN: direct.docker.labs.eazytraining.fr  
-  API_PORT: "1993"
-  API_ENDPOINT: ${EAZYLABS_IP}-${API_PORT}.${EAZYLABS_DOMAIN}
-  INTERNAL_PORT: 80
-  STG_EXTERNAL_PORT: 8080
-  PROD_EXTERNAL_PORT: 80
-  REVIEW_EXTERNAL_PORT: 8000
-  TEST_PORT: 90
-  CONTAINER_IMAGE: ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
+  APP_NAME: younesabdh-webapp
+  REVIEW_APP_NAME: younesabdh-webapp-${CI_COMMIT_REF_NAME}
+  REVIEW_API_ENDPOINT: ip10-0-1-4-cm07alq2mkn0ljtam6a0-1993.direct.docker.labs.eazytraining.fr
+  REVIEW_APP_ENDPOINT: ip10-0-1-4-cm07alq2mkn0ljtam6a0-80.direct.docker.labs.eazytraining.fr
+  STG_API_ENDPOINT: ip10-0-1-5-cm07alq2mkn0ljtam6a0-1993.direct.docker.labs.eazytraining.fr
+  STG_APP_ENDPOINT: ip10-0-1-5-cm07alq2mkn0ljtam6a0-80.direct.docker.labs.eazytraining.fr
+  PROD_API_ENDPOINT: ip10-0-1-6-cm07alq2mkn0ljtam6a0-1993.direct.docker.labs.eazytraining.fr
+  PROD_APP_ENDPOINT: ip10-0-1-6-cm07alq2mkn0ljtam6a0-80.direct.docker.labs.eazytraining.fr
+  INTERNAL_PORT: 5000
+  EXTERNAL_PORT: 80
+  #TEST_PORT : 80
+  CONTAINER_IMAGE: ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}
 
 image: docker:latest
 services:
@@ -27,6 +28,13 @@ stages:
   - Deploy prod
   - Test prod
 
+.test_template: &test
+  image: alpine
+  only:
+    - master
+  script:
+    - apk --no-cache add curl
+    - curl "http://$DOMAIN" | grep -i "Dimension" 
 
 docker-build:
   stage: Build image
@@ -37,13 +45,12 @@ docker-build:
     paths:
       - "${APP_NAME}.tar"
     when: on_success
-    expire_in: 2 days
 
 test acceptation:
   stage: Test acceptation
   script:
     - docker load < ${APP_NAME}.tar
-    - docker run -d -p ${TEST_PORT}:${INTERNAL_PORT}  --name webapp ${APP_NAME}
+    - docker run -d -p ${EXTERNAL_PORT}:${INTERNAL_PORT}  --name webapp ${APP_NAME}
     - apk --no-cache add curl
     - sleep 5
     - curl "http://docker:${TEST_PORT}" | grep -i "Dimension"
@@ -58,72 +65,64 @@ release image:
     - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
     - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
 
-deploy review:
-  stage: Deploy review
-  environment:
-    name: review/$CI_COMMIT_REF_NAME
-    url: http://${EAZYLABS_IP}-${REVIEW_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
-    on_stop: stop review
-  only: 
-    - merge_requests
-  script:
-    - apk --no-cache add curl
-    - 'curl -i -v -X POST http://${API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${REVIEW_EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}" 2>&1 | grep 200'
+# deploy review:
+#   stage: Deploy review
+#   environment:
+#     name: review/$CI_COMMIT_REF_NAME
+#     url: http://${EAZYLABS_IP}-${REVIEW_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
+#     on_stop: stop review
+#   only: 
+#     - merge_requests
+#   script:
+#     - apk --no-cache add curl
+#     - 'curl -i -v -X POST http://${API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${REVIEW_EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}" 2>&1 | grep 200'
     
-stop review:
-  stage: Stop review
-  variables:
-    GIT_STRATEGY: none
-  environment:
-    name: review/$CI_COMMIT_REF_NAME
-    action: stop
-  only: 
-    - merge_requests
-  when: manual
-  script:
-    - apk --no-cache add curl
-    - 'curl -i -v -X DELETE http://${API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\"}"'
+# stop review:
+#   stage: Stop review
+#   variables:
+#     GIT_STRATEGY: none
+#   environment:
+#     name: review/$CI_COMMIT_REF_NAME
+#     action: stop
+#   only: 
+#     - merge_requests
+#   when: manual
+#   script:
+#     - apk --no-cache add curl
+#     - 'curl -i -v -X DELETE http://${API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\"}"'
 
-.test_template: &test
-  image: alpine
-#  only:
-#    - main
-  script:
-    - apk --no-cache add curl
-    - curl "http://$DOMAIN" | grep -i "Dimension" 
+# deploy staging:
+#   stage: Deploy staging
+#   environment:
+#     name: staging
+#     url: http://${EAZYLABS_IP}-${STG_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
+# #  only:
+# #    - main
+#   script:
+#     - apk --no-cache add curl
+#     - 'curl -i -v -X POST http://${API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${STG_EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"  2>&1 | grep 200'
 
-deploy staging:
-  stage: Deploy staging
-  environment:
-    name: staging
-    url: http://${EAZYLABS_IP}-${STG_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
-#  only:
-#    - main
-  script:
-    - apk --no-cache add curl
-    - 'curl -i -v -X POST http://${API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${STG_EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"  2>&1 | grep 200'
+# test staging:
+#   stage: Test staging
+#   <<: *test
+#   variables:
+#     DOMAIN: ${EAZYLABS_IP}-${STG_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
 
-test staging:
-  stage: Test staging
-  <<: *test
-  variables:
-    DOMAIN: ${EAZYLABS_IP}-${STG_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
+# deploy prod:
+#   stage: Deploy prod
+#   environment:
+#     name: prod
+#     url: http://${EAZYLABS_IP}-${PROD_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
+#   only: 
+#     - main
+#   script:
+#     - apk --no-cache add curl
+#     - 'curl -v -X POST http://${API_ENDPOINT}/prod -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${PROD_EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}" 2>&1 | grep 200'
 
-deploy prod:
-  stage: Deploy prod
-  environment:
-    name: prod
-    url: http://${EAZYLABS_IP}-${PROD_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
-  only: 
-    - main
-  script:
-    - apk --no-cache add curl
-    - 'curl -v -X POST http://${API_ENDPOINT}/prod -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${PROD_EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}" 2>&1 | grep 200'
-
-test prod:
-  stage: Test prod
-  <<: *test
-  variables:
-    DOMAIN: ${EAZYLABS_IP}-${PROD_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
-  only:
-    - main
+# test prod:
+#   stage: Test prod
+#   <<: *test
+#   variables:
+#     DOMAIN: ${EAZYLABS_IP}-${PROD_EXTERNAL_PORT}.${EAZYLABS_DOMAIN}
+#   only:
+#     - main
