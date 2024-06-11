@@ -40,7 +40,7 @@ stages:
 
 docker-build:
   # Use the official docker image.
-  stage: build
+  stage: Build image
   script:
     - docker build -t  webpage .
     - docker save webpage > webpage.tar
