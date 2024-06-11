@@ -53,7 +53,7 @@ test acceptation:
     - docker run -d -p ${EXTERNAL_PORT}:${INTERNAL_PORT}  --name webapp ${APP_NAME}
     - apk --no-cache add curl
     - sleep 5
-    - curl "http://docker" | grep -i "Dimension"
+    - curl "http://docker:$TEST_PORT" | grep -i "Dimension"
 
 release image:
   stage: Release image
