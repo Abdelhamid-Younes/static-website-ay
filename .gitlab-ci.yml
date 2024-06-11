@@ -59,33 +59,15 @@ test acceptation:
     - apk --no-cache add curl
     - curl "http://docker:$APP_CONTAINER_PORT" | grep -i "Dimension"
 
-# docker-build:
-#   stage: Build image
-#   script:
-#     - docker build -t ${APP_NAME} .
-#     - docker save ${APP_NAME} > ${APP_NAME}.tar
-#   artifacts:
-#     paths:
-#       - ${APP_NAME}.tar
-
-# test acceptation:
-#   stage: Test acceptation
-#   script:
-#     - docker load < ${APP_NAME}.tar
-#     - docker run -d -p ${EXTERNAL_PORT}:${INTERNAL_PORT}  -e PORT=$APP_CONTAINER_PORT --name webapp ${APP_NAME}
-#     - apk --no-cache add curl
-#     - sleep 5
-#     - curl "http://docker:$APP_CONTAINER_PORT" | grep -i "Dimension"
-
-# release image:
-#   stage: Release image
-#   script:
-#     - docker load < ${APP_NAME}.tar
-#     - docker tag ${APP_NAME} "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
-#     - docker tag ${APP_NAME} "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
-#     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
-#     - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
-#     - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+release image:
+  stage: Release image
+  script:
+    - docker load < ${APP_NAME}.tar
+    - docker tag ${APP_NAME} "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
+    - docker tag ${APP_NAME} "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
+    - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
 
 # deploy review:
 #   stage: Deploy review
