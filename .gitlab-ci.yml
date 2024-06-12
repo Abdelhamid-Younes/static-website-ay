@@ -3,8 +3,8 @@ variables:
 #   REVIEW_APP_NAME: younesabdh-webapp-${CI_COMMIT_REF_NAME}
 #   REVIEW_API_ENDPOINT: ip10-0-1-4-cpkkmibj2epg00dv2hh0-1993.direct.docker.labs.eazytraining.fr
 #   REVIEW_APP_ENDPOINT: ip10-0-1-4-cpkkmibj2epg00dv2hh0-80.direct.docker.labs.eazytraining.fr
-   STG_API_ENDPOINT: "3.255.101.210:1993"
-   STG_APP_ENDPOINT: "3.255.101.210:80"
+#   STG_API_ENDPOINT: "3.255.101.210:1993"
+#   STG_APP_ENDPOINT: "3.255.101.210:80"
 #   PROD_API_ENDPOINT: ip10-0-1-6-cpkkmibj2epg00dv2hh0-1993.direct.docker.labs.eazytraining.fr
 #   PROD_APP_ENDPOINT: ip10-0-1-6-cpkkmibj2epg00dv2hh0-80.direct.docker.labs.eazytraining.fr
 #   INTERNAL_PORT: 5000
@@ -49,7 +49,7 @@ stages:
 #     paths:
 #       - ${APP_NAME}.tar
 
-.docker-build:
+docker-build:
   # Use the official docker image.
   stage: Build image
   script:
@@ -60,7 +60,7 @@ stages:
       - static-webapp.tar
     
 
-.test acceptation:
+test acceptation:
   # Official docker image.
   stage: Test acceptation
   script:
@@ -70,7 +70,7 @@ stages:
     - apk --no-cache add curl
     - curl "http://docker" | grep -i "Dimension"
 
-.release image:
+release image:
   stage: Release image
   script:
     - docker load < static-webapp.tar
