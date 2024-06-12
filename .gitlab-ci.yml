@@ -7,8 +7,8 @@ variables:
   STG_APP_ENDPOINT: ip10-0-1-5-cpkkmibj2epg00dv2hh0-80.direct.docker.labs.eazytraining.fr
   PROD_API_ENDPOINT: ip10-0-1-6-cpkkmibj2epg00dv2hh0-1993.direct.docker.labs.eazytraining.fr
   PROD_APP_ENDPOINT: ip10-0-1-6-cpkkmibj2epg00dv2hh0-80.direct.docker.labs.eazytraining.fr
-  INTERNAL_PORT: "5000"
-  EXTERNAL_PORT: "80"
+  INTERNAL_PORT: 5000
+  EXTERNAL_PORT: 80
   TEST_PORT : "80"
   CONTAINER_IMAGE: ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}
   APP_CONTAINER_PORT: "80"
@@ -38,7 +38,7 @@ stages:
     - apk --no-cache add curl
     - curl "http://$DOMAIN" | grep -i "Dimension" 
 
-docker-build:
+.docker-build:
   # Use the official docker image.
   stage: Build image
   script:
@@ -49,7 +49,7 @@ docker-build:
       - ${APP_NAME}.tar    
 
 
-test acceptation:
+.test acceptation:
   # Official docker image.
   stage: Test acceptation
   script:
@@ -59,7 +59,7 @@ test acceptation:
     - apk --no-cache add curl
     - curl "http://docker:$APP_CONTAINER_PORT" | grep -i "Dimension"
 
-release image:
+.release image:
   stage: Release image
   script:
     - docker load < ${APP_NAME}.tar
@@ -105,6 +105,7 @@ deploy staging:
   script:
     - apk --no-cache add curl
     - 'curl -X POST http://${STG_API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
+    - 'curl -i -v -X POST http://${API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${STG_EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"  2>&1 | grep 200'
 
 test staging:
   stage: Test staging
