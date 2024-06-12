@@ -1,18 +1,18 @@
-variables:
-  APP_NAME: younesabdh-webapp
-  REVIEW_APP_NAME: younesabdh-webapp-${CI_COMMIT_REF_NAME}
-  REVIEW_API_ENDPOINT: ip10-0-1-4-cpkkmibj2epg00dv2hh0-1993.direct.docker.labs.eazytraining.fr
-  REVIEW_APP_ENDPOINT: ip10-0-1-4-cpkkmibj2epg00dv2hh0-80.direct.docker.labs.eazytraining.fr
-  STG_API_ENDPOINT: ec2-3-255-101-210.eu-west-1.compute.amazonaws.com:1993
-  STG_APP_ENDPOINT: ec2-3-255-101-210.eu-west-1.compute.amazonaws.com:80
-  PROD_API_ENDPOINT: ip10-0-1-6-cpkkmibj2epg00dv2hh0-1993.direct.docker.labs.eazytraining.fr
-  PROD_APP_ENDPOINT: ip10-0-1-6-cpkkmibj2epg00dv2hh0-80.direct.docker.labs.eazytraining.fr
-  INTERNAL_PORT: 5000
-  EXTERNAL_PORT: 80
-  TEST_PORT : "80"
-  CONTAINER_IMAGE: ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}
-  APP_CONTAINER_PORT: "80"
-  APP_EXPOSED_PORT: "80"
+# variables:
+#   APP_NAME: younesabdh-webapp
+#   REVIEW_APP_NAME: younesabdh-webapp-${CI_COMMIT_REF_NAME}
+#   REVIEW_API_ENDPOINT: ip10-0-1-4-cpkkmibj2epg00dv2hh0-1993.direct.docker.labs.eazytraining.fr
+#   REVIEW_APP_ENDPOINT: ip10-0-1-4-cpkkmibj2epg00dv2hh0-80.direct.docker.labs.eazytraining.fr
+#   STG_API_ENDPOINT: ec2-3-255-101-210.eu-west-1.compute.amazonaws.com:1993
+#   STG_APP_ENDPOINT: ec2-3-255-101-210.eu-west-1.compute.amazonaws.com:80
+#   PROD_API_ENDPOINT: ip10-0-1-6-cpkkmibj2epg00dv2hh0-1993.direct.docker.labs.eazytraining.fr
+#   PROD_APP_ENDPOINT: ip10-0-1-6-cpkkmibj2epg00dv2hh0-80.direct.docker.labs.eazytraining.fr
+#   INTERNAL_PORT: 5000
+#   EXTERNAL_PORT: 80
+#   TEST_PORT : "80"
+#   CONTAINER_IMAGE: ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}
+#   APP_CONTAINER_PORT: "80"
+#   APP_EXPOSED_PORT: "80"
 
 image: docker:latest
 services:
@@ -38,28 +38,39 @@ stages:
     - apk --no-cache add curl
     - curl "http://$DOMAIN" | grep -i "Dimension" 
 
-.docker-build:
+# docker-build:
+#   # Use the official docker image.
+#   stage: Build image
+#   script:
+#     - docker build -t  ${APP_NAME} .
+#     - docker save ${APP_NAME} > ${APP_NAME}.tar
+#   artifacts:
+#     paths:
+#       - ${APP_NAME}.tar
+
+docker-build:
   # Use the official docker image.
   stage: Build image
   script:
-    - docker build -t  ${APP_NAME} .
-    - docker save ${APP_NAME} > ${APP_NAME}.tar
+    - docker build -t  static-webapp .
+    - docker save static-webapp > static-webapp.tar
   artifacts:
     paths:
-      - ${APP_NAME}.tar    
+      - static-webapp.tar
+    
 
-
-.test acceptation:
+test acceptation:
   # Official docker image.
   stage: Test acceptation
   script:
-    - docker load < ${APP_NAME}.tar
-    - docker run -d -p $APP_CONTAINER_PORT:$APP_EXPOSED_PORT -e PORT=$APP_CONTAINER_PORT --name webapp ${APP_NAME}
+    - docker load < static-webapp.tar
+    - docker run -d -p $80:5000 -e PORT=5000 --name webapp static-webapp
     - sleep 5
     - apk --no-cache add curl
-    - curl "http://docker:$APP_CONTAINER_PORT" | grep -i "Dimension"
+    - curl "http://docker" | grep -i "Dimension"
 
-.release image:
+
+release image:
   stage: Release image
   script:
     - docker load < ${APP_NAME}.tar
@@ -68,6 +79,26 @@ stages:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
     - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+
+# test acceptation:
+#   # Official docker image.
+#   stage: Test acceptation
+#   script:
+#     - docker load < ${APP_NAME}.tar
+#     - docker run -d -p $APP_CONTAINER_PORT:$APP_EXPOSED_PORT -e PORT=$APP_CONTAINER_PORT --name webapp ${APP_NAME}
+#     - sleep 5
+#     - apk --no-cache add curl
+#     - curl "http://docker:$APP_CONTAINER_PORT" | grep -i "Dimension"
+
+# release image:
+#   stage: Release image
+#   script:
+#     - docker load < ${APP_NAME}.tar
+#     - docker tag ${APP_NAME} "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
+#     - docker tag ${APP_NAME} "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+#     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+#     - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
+#     - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
 
 # deploy review:
 #   stage: Deploy review
@@ -95,22 +126,22 @@ stages:
 #     - apk --no-cache add curl
 #     - 'curl -i -v -X DELETE http://${API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\"}"'
 
-deploy staging:
-  stage: Deploy staging
-  environment:
-    name: staging
-    url: http://${STG_APP_ENDPOINT}
-  only:
-    - master
-  script:
-    - apk --no-cache add curl
-    - 'curl -X POST http://${STG_API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
+# deploy staging:
+#   stage: Deploy staging
+#   environment:
+#     name: staging
+#     url: http://${STG_APP_ENDPOINT}
+#   only:
+#     - master
+#   script:
+#     - apk --no-cache add curl
+#     - 'curl -X POST http://${STG_API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
 
-test staging:
-  stage: Test staging
-  <<: *test
-  variables:
-    DOMAIN: ${STG_APP_ENDPOINT}
+# test staging:
+#   stage: Test staging
+#   <<: *test
+#   variables:
+#     DOMAIN: ${STG_APP_ENDPOINT}
 
 # deploy prod:
 #   stage: Deploy prod
