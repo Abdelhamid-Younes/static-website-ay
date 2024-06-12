@@ -48,7 +48,7 @@ stages:
 #     paths:
 #       - ${APP_NAME}.tar
 
-.docker-build:
+docker-build:
   # Use the official docker image.
   stage: Build image
   script:
@@ -59,7 +59,7 @@ stages:
       - static-webapp.tar
     
 
-.test acceptation:
+test acceptation:
   # Official docker image.
   stage: Test acceptation
   script:
