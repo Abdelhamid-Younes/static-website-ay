@@ -89,6 +89,7 @@ deploy-staging:
     - chmod 600 ~/.ssh/id_rsa
     - ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
     - scp static-webapp.tar ec2-user@$EC2_HOST:/tmp/static-webapp.tar
+    - |
     - ssh ec2-user@$EC2_HOST << 'EOF'
         docker load < /tmp/static-webapp.tar
         docker stop webapp || true
