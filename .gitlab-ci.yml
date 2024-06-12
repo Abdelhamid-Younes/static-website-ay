@@ -48,7 +48,7 @@ stages:
 #     paths:
 #       - ${APP_NAME}.tar
 
-docker-build:
+.docker-build:
   # Use the official docker image.
   stage: Build image
   script:
@@ -64,7 +64,7 @@ test acceptation:
   stage: Test acceptation
   script:
     - docker load < static-webapp.tar
-    - docker run -d -p 80:5000 -e PORT=5000 --name webapp static-webapp
+    - docker run -d -p 80:80 --name webapp static-webapp
     - sleep 5
     - apk --no-cache add curl
     - curl "http://docker" | grep -i "Dimension"
