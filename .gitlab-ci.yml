@@ -1,4 +1,4 @@
-# variables:
+variables:
    APP_NAME: static-webapp
 #   REVIEW_APP_NAME: younesabdh-webapp-${CI_COMMIT_REF_NAME}
 #   REVIEW_API_ENDPOINT: ip10-0-1-4-cpkkmibj2epg00dv2hh0-1993.direct.docker.labs.eazytraining.fr
