@@ -88,13 +88,20 @@ deploy-staging:
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
     - ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
-    - scp static-webapp.tar ec2-user@$EC2_HOST:/tmp/static-webapp.tar
-    - |
+    #- scp static-webapp.tar ec2-user@$EC2_HOST:/tmp/static-webapp.tar
+
+    - command1="docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
+    - command2="docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+    - command3="docker rm -f webapp"
+    - command4="docker run -d -p 80:80 --name webapp $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+
       ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST << EOF
-         docker load < /tmp/static-webapp.tar
-         docker stop webapp || true
-         docker rm webapp || true
-         docker run -d -p 80:80 --name webapp static-webapp
+        -o SendEnv=CI_REGISTRY_IMAGE 
+        -o SendEnv=CI_COMMIT_REF_NAME 
+        -o SendEnv=CI_REGISTRY_USER 
+        -o SendEnv=CI_REGISTRY_PASSWORD 
+        -o SendEnv=CI_REGISTRY 
+        -C "$command1 && $command2 && $command3 && $command4"
       EOF
   only:
     - master
