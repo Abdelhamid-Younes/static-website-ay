@@ -95,22 +95,22 @@ stages:
 #     - apk --no-cache add curl
 #     - 'curl -i -v -X DELETE http://${API_ENDPOINT}/review -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\"}"'
 
-deploy staging:
-  stage: Deploy staging
-  environment:
-    name: staging
-    url: http://${STG_APP_ENDPOINT}
-  only:
-    - master
-  script:
-    - apk --no-cache add curl
-    - 'curl -X POST http://${STG_API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
+# deploy staging:
+#   stage: Deploy staging
+#   environment:
+#     name: staging
+#     url: http://${STG_APP_ENDPOINT}
+#   only:
+#     - master
+#   script:
+#     - apk --no-cache add curl
+#     - 'curl -X POST http://${STG_API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"'
 
-test staging:
-  stage: Test staging
-  <<: *test
-  variables:
-    DOMAIN: ${STG_APP_ENDPOINT}
+# test staging:
+#   stage: Test staging
+#   <<: *test
+#   variables:
+#     DOMAIN: ${STG_APP_ENDPOINT}
 
 # deploy prod:
 #   stage: Deploy prod
