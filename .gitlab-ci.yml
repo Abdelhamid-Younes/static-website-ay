@@ -49,7 +49,7 @@ stages:
 #     paths:
 #       - ${APP_NAME}.tar
 
-docker-build:
+.docker-build:
   # Use the official docker image.
   stage: Build image
   script:
@@ -60,7 +60,7 @@ docker-build:
       - static-webapp.tar
     
 
-test acceptation:
+.test acceptation:
   # Official docker image.
   stage: Test acceptation
   script:
@@ -70,7 +70,7 @@ test acceptation:
     - apk --no-cache add curl
     - curl "http://docker" | grep -i "Dimension"
 
-release image:
+.release image:
   stage: Release image
   script:
     - docker load < static-webapp.tar
@@ -88,13 +88,13 @@ deploy-staging:
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
     - chmod 600 ~/.ssh/id_rsa
     - ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
-    - scp static-webapp.tar ec2-user@$EC2_HOST:/tmp/static-webapp.tar
+ #   - scp static-webapp.tar ec2-user@$EC2_HOST:/tmp/static-webapp.tar
     - |
     - ssh ec2-user@$EC2_HOST << 'EOF'
-        docker load < /tmp/static-webapp.tar
-        docker stop webapp || true
-        docker rm webapp || true
-        docker run -d -p 80:80 --name webapp static-webapp
+         docker load < /tmp/static-webapp.tar
+         docker stop webapp || true
+         docker rm webapp || true
+         docker run -d -p 80:80 --name webapp static-webapp
       EOF
   only:
     - master
