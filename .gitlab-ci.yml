@@ -48,7 +48,7 @@ stages:
 #     paths:
 #       - ${APP_NAME}.tar
 
-.docker-build:
+docker-build:
   # Use the official docker image.
   stage: Build image
   script:
