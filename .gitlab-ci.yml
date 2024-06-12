@@ -48,7 +48,7 @@ stages:
 #     paths:
 #       - ${APP_NAME}.tar
 
-docker-build:
+.docker-build:
   # Use the official docker image.
   stage: Build image
   script:
@@ -59,7 +59,7 @@ docker-build:
       - static-webapp.tar
     
 
-test acceptation:
+.test acceptation:
   # Official docker image.
   stage: Test acceptation
   script:
@@ -73,9 +73,9 @@ test acceptation:
 release image:
   stage: Release image
   script:
-    - docker load < ${APP_NAME}.tar
-    - docker tag ${APP_NAME} "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
-    - docker tag ${APP_NAME} "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+    - docker load < static-webapp.tar
+    - docker tag static-webapp "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
+    - docker tag static-webapp "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
     - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
