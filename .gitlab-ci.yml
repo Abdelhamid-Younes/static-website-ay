@@ -38,7 +38,7 @@ stages:
     - apk --no-cache add curl
     - curl "http://$DOMAIN" | grep -i "Dimension" 
 
-.docker-build:
+docker-build:
   # Use the official docker image.
   stage: Build image
   script:
@@ -49,7 +49,7 @@ stages:
       - ${APP_NAME}.tar    
 
 
-.test acceptation:
+test acceptation:
   # Official docker image.
   stage: Test acceptation
   script:
@@ -59,7 +59,7 @@ stages:
     - apk --no-cache add curl
     - curl "http://docker:$APP_CONTAINER_PORT" | grep -i "Dimension"
 
-.release image:
+release image:
   stage: Release image
   script:
     - docker load < ${APP_NAME}.tar
