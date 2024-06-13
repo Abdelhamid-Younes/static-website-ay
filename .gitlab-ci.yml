@@ -84,8 +84,8 @@ release image:
 deploy-staging:
   stage: Deploy staging
   environment:
-  name: staging
-  url: http://${EC2_HOST_STAGING}
+    name: staging
+    url: http://${EC2_HOST_STAGING}
   only:
     - master
   script:
@@ -121,8 +121,8 @@ test staging:
 deploy-prod:
   stage: Deploy prod
   environment:
-  name: prod
-  url: http://${EC2_HOST_PROD}
+    name: prod
+    url: http://${EC2_HOST_PROD}
   only:
     - master
   script:
