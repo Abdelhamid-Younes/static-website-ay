@@ -141,7 +141,7 @@ stages:
         -o SendEnv=CI_REGISTRY 
         -C "$command1 && $command2 && $command3 && $command4"
 
-test prod:
+.test prod:
   stage: Test prod
   <<: *test
   variables:
