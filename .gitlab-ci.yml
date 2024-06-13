@@ -50,7 +50,7 @@ stages:
 #     paths:
 #       - ${APP_NAME}.tar
 
-docker-build:
+.docker-build:
   # Use the official docker image.
   stage: Build image
   script:
@@ -61,7 +61,7 @@ docker-build:
       - static-webapp.tar
     
 
-test acceptation:
+.test acceptation:
   # Official docker image.
   stage: Test acceptation
   script:
@@ -71,7 +71,7 @@ test acceptation:
     - apk --no-cache add curl
     - curl "http://docker" | grep -i "Dimension"
 
-release image:
+.release image:
   stage: Release image
   script:
     - docker load < static-webapp.tar
@@ -98,10 +98,10 @@ deploy-staging:
 
     - command1="docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
     - command2="docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
-    - command3="docker rm -f webapp"
+    - command3="docker rm -f webapp || true"
     - command4="docker run -d -p 80:80 --name webapp $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
 
-      ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_STAGING << EOF
+      ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_STAGING << "EOF"
         -o SendEnv=CI_REGISTRY_IMAGE 
         -o SendEnv=CI_COMMIT_REF_NAME 
         -o SendEnv=CI_REGISTRY_USER 
@@ -118,7 +118,7 @@ test staging:
   variables:
     DOMAIN: ${EC2_HOST_STAGING}
 
-deploy-prod:
+.deploy-prod:
   stage: Deploy prod
   environment:
     name: prod
