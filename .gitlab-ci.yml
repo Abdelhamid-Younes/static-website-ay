@@ -100,13 +100,14 @@ deploy-staging:
     - command2="docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
     - command3="docker rm -f webapp || true"
     - command4="docker run -d -p 80:80 --name webapp $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
-      ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_STAGING
+      ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_STAGING << 'EOF'
         -o SendEnv=CI_REGISTRY_IMAGE 
         -o SendEnv=CI_COMMIT_REF_NAME 
         -o SendEnv=CI_REGISTRY_USER 
         -o SendEnv=CI_REGISTRY_PASSWORD 
         -o SendEnv=CI_REGISTRY 
         -C "$command1 && $command2 && $command3 && $command4"
+      EOF
 
 test staging:
   stage: Test staging
