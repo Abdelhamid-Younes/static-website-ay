@@ -51,7 +51,7 @@ stages:
 #     paths:
 #       - ${APP_NAME}.tar
 
-.docker-build:
+docker-build:
   # Use the official docker image.
   stage: Build image
   script:
@@ -62,7 +62,7 @@ stages:
       - static-webapp.tar
     
 
-.test acceptation:
+test acceptation:
   # Official docker image.
   stage: Test acceptation
   script:
@@ -72,7 +72,7 @@ stages:
     - apk --no-cache add curl
     - curl "http://docker" | grep -i "Dimension"
 
-.release image:
+release image:
   stage: Release image
   script:
     - docker load < static-webapp.tar
@@ -82,7 +82,7 @@ stages:
     - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
     - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
 
-.deploy-staging:
+deploy-staging:
   stage: Deploy staging
   environment:
     name: staging
@@ -110,13 +110,13 @@ stages:
         -C "$command1 && $command2 && $command3 && $command4"
       
 
-.test staging:
+test staging:
   stage: Test staging
   <<: *test
   variables:
     DOMAIN: ${EC2_HOST_STAGING}
 
-.deploy-prod:
+deploy-prod:
   stage: Deploy prod
   environment:
     name: prod
@@ -141,7 +141,7 @@ stages:
         -o SendEnv=CI_REGISTRY 
         -C "$command1 && $command2 && $command3 && $command4"
 
-.test prod:
+test prod:
   stage: Test prod
   <<: *test
   variables:
@@ -194,4 +194,3 @@ stop-review:
     - ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_REVIEW
         echo "Stopping and removing the webapp container..."
         -C "$command1 && $command2"
-
