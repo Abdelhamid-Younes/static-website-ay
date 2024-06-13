@@ -41,16 +41,6 @@ stages:
     - apk --no-cache add curl
     - curl "http://$DOMAIN" | grep -i "Dimension" 
 
-# docker-build:
-#   # Use the official docker image.
-#   stage: Build image
-#   script:
-#     - docker build -t  ${APP_NAME} .
-#     - docker save ${APP_NAME} > ${APP_NAME}.tar
-#   artifacts:
-#     paths:
-#       - ${APP_NAME}.tar
-
 docker-build:
   # Use the official docker image.
   stage: Build image
