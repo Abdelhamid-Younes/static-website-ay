@@ -81,7 +81,7 @@ stages:
     - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
     - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
 
-deploy-staging:
+.deploy-staging:
   stage: Deploy staging
   environment:
     name: staging
@@ -109,13 +109,13 @@ deploy-staging:
         -C "$command1 && $command2 && $command3 && $command4"
       
 
-test staging:
+.test staging:
   stage: Test staging
   <<: *test
   variables:
     DOMAIN: ${EC2_HOST_STAGING}
 
-.deploy-prod:
+deploy-prod:
   stage: Deploy prod
   environment:
     name: prod
@@ -134,19 +134,15 @@ test staging:
     - command2="docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
     - command3="docker rm -f webapp"
     - command4="docker run -d -p 80:80 --name webapp $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
-
-      ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_PROD << EOF
+    - ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_PROD
         -o SendEnv=CI_REGISTRY_IMAGE 
         -o SendEnv=CI_COMMIT_REF_NAME 
         -o SendEnv=CI_REGISTRY_USER 
         -o SendEnv=CI_REGISTRY_PASSWORD 
         -o SendEnv=CI_REGISTRY 
         -C "$command1 && $command2 && $command3 && $command4"
-      EOF
-  only:
-    - master
 
-.test prod:
+test prod:
   stage: Test prod
   <<: *test
   variables:
