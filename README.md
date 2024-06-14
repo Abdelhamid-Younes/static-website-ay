@@ -57,8 +57,8 @@ Before setting up and running the CI/CD pipeline for this project, you need to e
     - Ensure the `.gitlab-ci.yml` file is present in the root of your repository. This file defines the CI/CD pipeline configuration.
 
 3. **Configure Environment Variables**: 
-    - `EC2_HOST_REVIEW`: The IP address of your review environment server.
-    - `EC2_HOST_DEPLOY`: The IP address of your staging/production server (if not set dynamically).
+    - `EC2_HOST_REVIEW`: The IP address of your review environment server (if not set dynamically).
+    - `EC2_HOST_DEPLOY`: The IP address of your staging/production server.
 
 4. **Run the Pipeline**:
     - Push your code changes to GitLab. The CI/CD pipeline will be triggered automatically based on the `.gitlab-ci.yml` configuration.
