@@ -50,7 +50,7 @@ stages:
     - command2="docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
     - command3="docker rm -f webapp || true"
     - command4="docker run -d -p 80:80 --name webapp $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
-    - ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_DEPLOY  #  Execute Docker commands on the remote server via SSH
+    - ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_DEPLOY
         -o SendEnv=CI_REGISTRY_IMAGE 
         -o SendEnv=CI_COMMIT_REF_NAME 
         -o SendEnv=CI_REGISTRY_USER 
