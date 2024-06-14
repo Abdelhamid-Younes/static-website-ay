@@ -149,7 +149,7 @@ deploy-review:
   environment:
     name: review/$CI_COMMIT_REF_NAME
     url: http://${EC2_HOST_REVIEW}
-    on_stop: stop-review
+    #on_stop: stop-review
   only:
     - master
   before_script:
