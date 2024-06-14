@@ -72,7 +72,7 @@ stages:
     - docker push "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
     - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
 
-deploy-staging:
+.deploy-staging:
   stage: Deploy staging
   only:
     - master
@@ -102,43 +102,48 @@ deploy-staging:
         -o SendEnv=CI_REGISTRY 
         -C "$command1 && $command2 && $command3 && $command4"
 
-test staging:
+.test staging:
   stage: Test staging
   <<: *test
   variables:
     DOMAIN: ${EC2_HOST_STAGING}
 
-# deploy-prod:
-#   stage: Deploy prod
-#   environment:
-#     name: prod
-#     url: http://${EC2_HOST_PROD}
-#   only:
-#     - master
-#   before_script:
-#     - apk add --no-cache openssh-client
-#     - mkdir -p ~/.ssh
-#     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-#     - chmod 600 ~/.ssh/id_rsa
-#     - ssh-keyscan -H $EC2_HOST_PROD >> ~/.ssh/known_hosts
-#   script:
-#     - command1="docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
-#     - command2="docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
-#     - command3="docker rm -f webapp || true"
-#     - command4="docker run -d -p 80:80 --name webapp $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
-#     - ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_PROD
-#         -o SendEnv=CI_REGISTRY_IMAGE 
-#         -o SendEnv=CI_COMMIT_REF_NAME 
-#         -o SendEnv=CI_REGISTRY_USER 
-#         -o SendEnv=CI_REGISTRY_PASSWORD 
-#         -o SendEnv=CI_REGISTRY 
-#         -C "$command1 && $command2 && $command3 && $command4"
+deploy-prod:
+  stage: Deploy prod
+  environment:
+    name: prod
+    url: http://${EC2_HOST_PROD}
+  only:
+    - master
+  before_script:
+  before_script:
+    - apk add --no-cache openssh-client
+    - eval $(ssh-agent -s)
+    - mkdir -p ~/.ssh
+    - chmod -R 400 ~/.ssh
+    - touch ~/.ssh/known_hosts
+    - cd ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > id_rsa
+    - chmod 0400 id_rsa
+    - ssh-keyscan -H $EC2_HOST_PROD >> ~/.ssh/known_hosts
+  script:
+    - command1="docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
+    - command2="docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+    - command3="docker rm -f webapp || true"
+    - command4="docker run -d -p 80:80 --name webapp $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+    - ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_PROD
+        -o SendEnv=CI_REGISTRY_IMAGE 
+        -o SendEnv=CI_COMMIT_REF_NAME 
+        -o SendEnv=CI_REGISTRY_USER 
+        -o SendEnv=CI_REGISTRY_PASSWORD 
+        -o SendEnv=CI_REGISTRY 
+        -C "$command1 && $command2 && $command3 && $command4"
 
-# test prod:
-#   stage: Test prod
-#   <<: *test
-#   variables:
-#     DOMAIN: ${EC2_HOST_PROD}
+test prod:
+  stage: Test prod
+  <<: *test
+  variables:
+    DOMAIN: ${EC2_HOST_PROD}
 
 # deploy-review:
 #   stage: Deploy review
