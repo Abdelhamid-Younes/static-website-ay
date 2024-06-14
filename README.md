@@ -2,8 +2,6 @@
 
 ## Overview
 
-## Overview
-
 This project demonstrates a CI/CD pipeline for deploying a static web application using Docker and GitLab CI/CD. The application is built, tested, and deployed to various environments, including review, staging, and production (ec2 instances are used for deploying)
 
 The application used in this project is a static website example, available at: [https://github.com/diranetafen/static-website-example.git](https://github.com/diranetafen/static-website-example.git).
@@ -51,10 +49,10 @@ Before setting up and running the CI/CD pipeline for this project, you need to e
     - If you don't have a GitLab account, you can create one at [GitLab](https://gitlab.com/users/sign_up).
 
 3. **SSH Access Configured for Target servers**:
-    Add your SSH private key as a GitLab CI/CD variable. Navigate to your project’s `Settings` > `CI / CD` > `Variables` and add a variable named `SSH_PRIVATE_KEY`, with the value set to the contents of your private key (`id_rsa`).
+    - Add your SSH private key as a GitLab CI/CD variable. Navigate to your project’s `Settings` > `CI / CD` > `Variables` and add a variable named `SSH_PRIVATE_KEY`, with the value set to the contents of your private key (`id_rsa`).
 
 ### Setup
-1. fork the repository
+1. **fork the repository**
 2. **Set Up GitLab CI/CD**:
     - Ensure the `.gitlab-ci.yml` file is present in the root of your repository. This file defines the CI/CD pipeline configuration.
 
