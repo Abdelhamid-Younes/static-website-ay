@@ -35,3 +35,70 @@ The CI/CD pipeline is defined in the `.gitlab-ci.yml` file and consists of sever
 - `APP_NAME`: The name of the application.
 - `EC2_HOST_REVIEW`: The IP address for the review environment.
 - `EC2_HOST_DEPLOY`: Dynamically set for staging and production deployments.
+
+## Getting Started
+
+### Prerequisites
+
+Before setting up and running the CI/CD pipeline for this project, you need to ensure you have the following:
+
+1. **Docker**: 
+    - Docker is required to build, run, and deploy the application containers. 
+    - Install Docker by following the instructions on the [Docker installation page](https://docs.docker.com/get-docker/).
+
+2. **GitLab Account**:
+    - A GitLab account is required to host your repository and use GitLab CI/CD for automating the pipeline.
+    - If you don't have a GitLab account, you can create one at [GitLab](https://gitlab.com/users/sign_up).
+
+3. **SSH Access Configured for Target Servers**:
+    - SSH access is needed to deploy the application to your target servers (review, staging, and production environments).
+    - Ensure you have SSH keys generated and added to your GitLab account. Follow these steps:
+        1. **Generate SSH Key**:
+            - If you don’t have an SSH key pair, generate one using the following command:
+                ```sh
+                ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+                ```
+            - This will create a public key (`id_rsa.pub`) and a private key (`id_rsa`) in the `~/.ssh` directory.
+
+        2. **Add SSH Key to GitLab**:
+            - Copy the contents of your public key file (`id_rsa.pub`):
+                ```sh
+                cat ~/.ssh/id_rsa.pub
+                ```
+            - Go to GitLab, navigate to `User Settings` > `SSH Keys`, and paste the copied content into the "Key" field, then click "Add key".
+
+        3. **Add SSH Key to Your Servers**:
+            - Add your SSH public key to the `~/.ssh/authorized_keys` file on your target servers. This allows the GitLab CI/CD runner to connect to your servers during deployment.
+
+        4. **Configure SSH Private Key in GitLab CI/CD**:
+            - Add your SSH private key as a GitLab CI/CD variable. Navigate to your project’s `Settings` > `CI / CD` > `Variables` and add a variable named `SSH_PRIVATE_KEY`, with the value set to the contents of your private key (`id_rsa`).
+
+### Setup
+
+1. **Clone the Repository**:
+    ```sh
+    git clone https://github.com/yourusername/your-repo.git
+    cd your-repo
+    ```
+
+2. **Set Up GitLab CI/CD**:
+    - Ensure the `.gitlab-ci.yml` file is present in the root of your repository. This file defines the CI/CD pipeline configuration.
+
+3. **Configure Environment Variables**:
+    - In GitLab, navigate to your project’s `Settings` > `CI / CD` > `Variables` and set the following variables:
+        - `CI_REGISTRY_USER`: Your GitLab registry username.
+        - `CI_REGISTRY_PASSWORD`: Your GitLab registry password.
+        - `CI_REGISTRY`: Your GitLab registry URL (e.g., `registry.gitlab.com`).
+        - `IMAGE_NAME`: The name of your Docker image (e.g., `registry.gitlab.com/yourusername/your-repo`).
+        - `EC2_HOST_REVIEW`: The IP address of your review environment server.
+        - `EC2_HOST_DEPLOY`: The IP address of your staging/production server (if not set dynamically).
+
+4. **Run the Pipeline**:
+    - Push your code changes to GitLab. The CI/CD pipeline will be triggered automatically based on the `.gitlab-ci.yml` configuration.
+    - Monitor the pipeline progress in the `CI / CD` > `Pipelines` section of your GitLab project.
+
+## Maintainers
+
+- Abdelhamid YOUNES
+
+Feel free to reach out if you have any questions or need further assistance.
