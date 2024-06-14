@@ -59,6 +59,8 @@ stages:
 docker-build:
   # Use the official docker image.
   stage: Build image
+  rules:
+    - if: $CI_OPEN_MERGE_REQUESTS || $CI_COMMIT_REF_SLUG
   variables:
     GIT_STRATEGY: clone
   script:
@@ -71,6 +73,8 @@ docker-build:
 test acceptation:
   # Official docker image.
   stage: Test acceptation
+  rules:
+    - if: $CI_OPEN_MERGE_REQUESTS || $CI_COMMIT_REF_SLUG
   script:
     - docker load < static-webapp.tar
     - docker run -d -p 80:80 --name webapp static-webapp
@@ -80,6 +84,8 @@ test acceptation:
 
 release image:
   stage: Release image
+  rules:
+    - if: $CI_OPEN_MERGE_REQUESTS || $CI_COMMIT_REF_SLUG
   script:
     - docker load < static-webapp.tar
     - docker tag static-webapp "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
