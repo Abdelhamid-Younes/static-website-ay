@@ -31,18 +31,27 @@
 # EXPOSE 80
 # ENTRYPOINT ["/usr/sbin/nginx", "-g", "daemon off;"]
 
-FROM alpine:3.12
-LABEL maintainer="Abdelhamid YOUNES"
+# First stage: clone the repository using Alpine
+FROM alpine:3.17 AS files
+LABEL maintainer='Abdelhamid YOUNES'
 
-# Install dependencies in a single RUN instruction
-RUN apk add --no-cache nginx git
+# Install git in a single RUN command to reduce image layers
+RUN apk add --no-cache git && \
+    mkdir /opt/files && \
+    git clone https://github.com/diranetafen/static-website-example.git /opt/files/
 
-# Remove default Nginx files and clone the repository
-RUN rm -Rf /var/www/html/* && \
-    git clone https://github.com/diranetafen/static-website-example.git /var/www/html/
+# Second stage: use a slim Nginx base image
+FROM nginx:stable-alpine AS webserver
+LABEL maintainer='Abdelhamid YOUNES'
 
-# Expose the Nginx port
+# Copy files from the previous stage
+COPY --from=files /opt/files/ /usr/share/nginx/html/
+
+# Copy the nginx configuration file (if you have a custom one)
+# COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port 80
 EXPOSE 80
 
-# Set the entry point to start Nginx
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
