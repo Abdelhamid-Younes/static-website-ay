@@ -182,3 +182,4 @@ stop-review:
     - ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_REVIEW
         echo "Stopping and removing the webapp container..."
         -C "$command1 && $command2"
+        
