@@ -2,7 +2,12 @@
 
 ## Overview
 
-This project demonstrates a CI/CD pipeline for deploying a static web application using Docker and GitLab CI/CD. The application is built, tested, and deployed to various environments, including review, staging, and production ( i have used ec2 instances of aws).
+## Overview
+
+This project demonstrates a CI/CD pipeline for deploying a static web application using Docker and GitLab CI/CD. The application is built, tested, and deployed to various environments, including review, staging, and production (ec2 instances are used for deploying)
+
+The application used in this project is a static website example, available at: [https://github.com/diranetafen/static-website-example.git](https://github.com/diranetafen/static-website-example.git).
+
 
 ## Project Structure
 
