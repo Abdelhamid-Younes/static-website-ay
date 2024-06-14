@@ -59,19 +59,19 @@ stages:
         -C "$command1 && $command2 && $command3 && $command4"
   dependencies: []
 
-docker-build:
-  # Use the official docker image.
-  stage: Build image
-  rules:
-    - if: $CI_OPEN_MERGE_REQUESTS || $CI_COMMIT_REF_SLUG
-  variables:
-    GIT_STRATEGY: clone  # Ensure the repository is cloned
-  script:
-    - docker build -t  static-webapp .
-    - docker save static-webapp > static-webapp.tar
-  artifacts:
-    paths:
-      - static-webapp.tar
+# docker-build:
+#   # Use the official docker image.
+#   stage: Build image
+#   rules:
+#     - if: $CI_OPEN_MERGE_REQUESTS || $CI_COMMIT_REF_SLUG
+#   variables:
+#     GIT_STRATEGY: clone  # Ensure the repository is cloned
+#   script:
+#     - docker build -t  static-webapp .
+#     - docker save static-webapp > static-webapp.tar
+#   artifacts:
+#     paths:
+#       - static-webapp.tar
 
 # test acceptation:
 #   # Official docker image.
