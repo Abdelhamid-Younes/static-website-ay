@@ -11,8 +11,8 @@ variables:
 #   EXTERNAL_PORT: 80
 #   TEST_PORT : "80"
    CONTAINER_IMAGE: ${IMAGE_NAME}:${CI_COMMIT_REF_NAME}
-   EC2_HOST_STAGING: "34.244.189.130"
-   EC2_HOST_PROD: "3.252.146.25"
+   EC2_HOST_STAGING: "52.214.185.12"
+   EC2_HOST_PROD: "34.250.16.82"
    EC2_HOST_REVIEW: "3.249.127.181"
 #   APP_CONTAINER_PORT: "80"
 #   APP_EXPOSED_PORT: "80"
@@ -74,19 +74,22 @@ stages:
 
 deploy-staging:
   stage: Deploy staging
+  only:
+    - master
   environment:
     name: staging
     url: http://${EC2_HOST_STAGING}
-  only:
-    - master
-  script:
+  before_script:
     - apk add --no-cache openssh-client
+    - eval $(ssh-agent -s)
     - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
+    - chmod -R 400 ~/.ssh
+    - touch ~/.ssh/known_hosts
+    - cd ~/.ssh
+    - echo "$SSH_PRIVATE_KEY" > id_rsa
+    - chmod 0400 id_rsa
     - ssh-keyscan -H $EC2_HOST_STAGING >> ~/.ssh/known_hosts
-    #- scp static-webapp.tar ec2-user@$EC2_HOST:/tmp/static-webapp.tar
-
+  script:
     - command1="docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
     - command2="docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
     - command3="docker rm -f webapp || true"
@@ -98,7 +101,6 @@ deploy-staging:
         -o SendEnv=CI_REGISTRY_PASSWORD 
         -o SendEnv=CI_REGISTRY 
         -C "$command1 && $command2 && $command3 && $command4"
-      
 
 test staging:
   stage: Test staging
@@ -106,81 +108,82 @@ test staging:
   variables:
     DOMAIN: ${EC2_HOST_STAGING}
 
-deploy-prod:
-  stage: Deploy prod
-  environment:
-    name: prod
-    url: http://${EC2_HOST_PROD}
-  only:
-    - master
-  script:
-    - apk add --no-cache openssh-client
-    - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
-    - ssh-keyscan -H $EC2_HOST_PROD >> ~/.ssh/known_hosts
-    - command1="docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
-    - command2="docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
-    - command3="docker rm -f webapp || true"
-    - command4="docker run -d -p 80:80 --name webapp $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
-    - ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_PROD
-        -o SendEnv=CI_REGISTRY_IMAGE 
-        -o SendEnv=CI_COMMIT_REF_NAME 
-        -o SendEnv=CI_REGISTRY_USER 
-        -o SendEnv=CI_REGISTRY_PASSWORD 
-        -o SendEnv=CI_REGISTRY 
-        -C "$command1 && $command2 && $command3 && $command4"
+# deploy-prod:
+#   stage: Deploy prod
+#   environment:
+#     name: prod
+#     url: http://${EC2_HOST_PROD}
+#   only:
+#     - master
+#   before_script:
+#     - apk add --no-cache openssh-client
+#     - mkdir -p ~/.ssh
+#     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+#     - chmod 600 ~/.ssh/id_rsa
+#     - ssh-keyscan -H $EC2_HOST_PROD >> ~/.ssh/known_hosts
+#   script:
+#     - command1="docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
+#     - command2="docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+#     - command3="docker rm -f webapp || true"
+#     - command4="docker run -d -p 80:80 --name webapp $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+#     - ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_PROD
+#         -o SendEnv=CI_REGISTRY_IMAGE 
+#         -o SendEnv=CI_COMMIT_REF_NAME 
+#         -o SendEnv=CI_REGISTRY_USER 
+#         -o SendEnv=CI_REGISTRY_PASSWORD 
+#         -o SendEnv=CI_REGISTRY 
+#         -C "$command1 && $command2 && $command3 && $command4"
 
-test prod:
-  stage: Test prod
-  <<: *test
-  variables:
-    DOMAIN: ${EC2_HOST_PROD}
+# test prod:
+#   stage: Test prod
+#   <<: *test
+#   variables:
+#     DOMAIN: ${EC2_HOST_PROD}
 
-deploy-review:
-  stage: Deploy review
-  environment:
-    name: review/$CI_COMMIT_REF_NAME
-    url: http://${EC2_HOST_REVIEW}
-    on_stop: stop-review
-  only:
-    - merge_requests
-  script:
-    - apk add --no-cache openssh-client
-    - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
-    - ssh-keyscan -H $EC2_HOST_REVIEW >> ~/.ssh/known_hosts
-    - command1="docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
-    - command2="docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
-    - command3="docker rm -f webapp || true"
-    - command4="docker run -d -p 80:80 --name webapp $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
-    - ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_REVIEW
-        -o SendEnv=CI_REGISTRY_IMAGE 
-        -o SendEnv=CI_COMMIT_REF_NAME 
-        -o SendEnv=CI_REGISTRY_USER 
-        -o SendEnv=CI_REGISTRY_PASSWORD 
-        -o SendEnv=CI_REGISTRY 
-        -C "$command1 && $command2 && $command3 && $command4"
+# deploy-review:
+#   stage: Deploy review
+#   environment:
+#     name: review/$CI_COMMIT_REF_NAME
+#     url: http://${EC2_HOST_REVIEW}
+#     on_stop: stop-review
+#   only:
+#     - merge_requests
+#   script:
+#     - apk add --no-cache openssh-client
+#     - mkdir -p ~/.ssh
+#     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+#     - chmod 600 ~/.ssh/id_rsa
+#     - ssh-keyscan -H $EC2_HOST_REVIEW >> ~/.ssh/known_hosts
+#     - command1="docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY"
+#     - command2="docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+#     - command3="docker rm -f webapp || true"
+#     - command4="docker run -d -p 80:80 --name webapp $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+#     - ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_REVIEW
+#         -o SendEnv=CI_REGISTRY_IMAGE 
+#         -o SendEnv=CI_COMMIT_REF_NAME 
+#         -o SendEnv=CI_REGISTRY_USER 
+#         -o SendEnv=CI_REGISTRY_PASSWORD 
+#         -o SendEnv=CI_REGISTRY 
+#         -C "$command1 && $command2 && $command3 && $command4"
 
-stop-review:
-  stage: Stop review
-  variables:
-    GIT_STRATEGY: none
-  environment:
-    name: review/$CI_COMMIT_REF_NAME
-    action: stop
-  only: 
-    - merge_requests
-  when: manual
-  script:
-    - apk add --no-cache openssh-client
-    - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
-    - ssh-keyscan -H $EC2_HOST_REVIEW >> ~/.ssh/known_hosts
-    - command1="docker stop webapp || true"
-    - command2="docker rm webapp || true"
-    - ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_REVIEW
-        echo "Stopping and removing the webapp container..."
-        -C "$command1 && $command2"
+# stop-review:
+#   stage: Stop review
+#   variables:
+#     GIT_STRATEGY: none
+#   environment:
+#     name: review/$CI_COMMIT_REF_NAME
+#     action: stop
+#   only: 
+#     - merge_requests
+#   when: manual
+#   script:
+#     - apk add --no-cache openssh-client
+#     - mkdir -p ~/.ssh
+#     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
+#     - chmod 600 ~/.ssh/id_rsa
+#     - ssh-keyscan -H $EC2_HOST_REVIEW >> ~/.ssh/known_hosts
+#     - command1="docker stop webapp || true"
+#     - command2="docker rm webapp || true"
+#     - ssh -o StrictHostKeyChecking=no ec2-user@$EC2_HOST_REVIEW
+#         echo "Stopping and removing the webapp container..."
+#         -C "$command1 && $command2"
