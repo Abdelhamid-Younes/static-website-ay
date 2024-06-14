@@ -28,7 +28,7 @@ stages:
     - master
   script:
     - apk --no-cache add curl
-    - curl "http://$DOMAIN" | grep -i "Dimension" 
+    - curl "http://$EC2_HOST_DEPLOY" | grep -i "Dimension" 
 
 .deploy: &deploy
   before_script:
@@ -98,8 +98,8 @@ deploy-staging:
 test staging:
   stage: Test staging
   <<: *test
-  variables:
-    DOMAIN: ${EC2_HOST_STAGING}
+  environment:
+    name: staging
 
 deploy-prod:
   stage: Deploy prod
@@ -113,8 +113,8 @@ deploy-prod:
 test prod:
   stage: Test prod
   <<: *test
-  variables:
-    DOMAIN: ${EC2_HOST_PROD}
+  environment:
+    name: prod
 
 deploy-review:
   stage: Deploy review
