@@ -4,7 +4,8 @@ variables:
    EC2_HOST_REVIEW: "34.241.202.3"
 
 image: docker:latest
-interruptible: true
+default:
+  interruptible: true
 services:
   - name: docker:dind
     alias: docker
