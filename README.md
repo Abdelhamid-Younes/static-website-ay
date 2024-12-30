@@ -1,4 +1,4 @@
-# Static Web Application CI/CD Pipeline
+# Static Web Application CI/CD Pipeline.
 
 ## Overview
 
